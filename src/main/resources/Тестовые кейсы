@@ -1,0 +1,302 @@
+ <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.6.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+-- hierarhy
+    public static void printExceptionHierarchy(Class<? extends Throwable> throwableClass) {
+        Class<?> superClass = throwableClass;
+        int index = 0;
+
+        while (superClass != null) {
+            System.out.println(String.format("%d - %s", ++index, superClass.getName()));
+            superClass = superClass.getSuperclass();
+        }
+    }
+
+
+1) success. Output: 1, 3
+    public void tryCatchGood(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+        } catch (Exception e) {
+            consumer.accept(2);
+        } finally {
+            consumer.accept(3);
+        }
+    }
+
+2) success. Output: 1, 3, 4
+public void tryCatch1(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+        } finally {
+            consumer.accept(4);
+        }
+    }
+
+3) error -2- output 1, 3, 5
+
+  public void tryCatch2(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+            if (true) {
+                throw new RuntimeException("- 2 -");
+            }
+            consumer.accept(4);
+        } finally {
+            consumer.accept(5);
+        }
+
+  4) error 2, output 1, 5
+      public int tryCatch4(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                return 1;
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+            consumer.accept(4);
+        } finally {
+            consumer.accept(5);
+            if (true) {
+                throw new RuntimeException("- 2 -");
+            }
+
+            consumer.accept(6);
+        }
+
+        throw new RuntimeException();
+    }
+
+  5)
+        public int tryCatch5(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                return 1;
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+            if (true) {
+                return 2;
+            }
+            consumer.accept(4);
+        } finally {
+            consumer.accept(5);
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+
+            consumer.accept(6);
+        }
+
+        throw new RuntimeException();
+    }
+
+    public int tryCatch6(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                return 1;
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+            if (true) {
+                return 2;
+            }
+            consumer.accept(4);
+        } finally {
+            consumer.accept(5);
+            if (true) {
+                return 3;
+            }
+
+            consumer.accept(6);
+        }
+
+        throw new RuntimeException();
+    }
+
+    public int tryCatch7(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                throw new StackOverflowError("- 1 -");
+            }
+
+            consumer.accept(2);
+
+        } finally {
+            consumer.accept(3);
+            if (true) {
+                return 1;
+            }
+
+            consumer.accept(4);
+        }
+
+        throw new RuntimeException();
+    }
+
+      public int tryCatch8(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+
+            consumer.accept(2);
+
+        } finally {
+            consumer.accept(3);
+        }
+
+        throw new RuntimeException();
+    }
+
+    public void tryCatch9(Consumer<Integer> consumer) {
+        try {
+            consumer.accept(1);
+
+            if (true) {
+                throw new RuntimeException("- 1 -");
+            }
+
+            consumer.accept(2);
+
+        } catch (Exception e) {
+            consumer.accept(3);
+
+            if (true) {
+                throw new RuntimeException("- 2 -");
+            }
+
+            consumer.accept(4);
+        }
+    }
+
+
+
+  Проверки:
+
+      @Test
+    public void testTryCatch1() {
+        new TryCatch().tryCatch1(System.out::println);
+    }
+
+    @Test
+    public void testTryCatch2() {
+        Assertions.assertEquals("- 2 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch2(System.out::println))
+                .getMessage());
+    }
+
+    @Test
+    public void testTryCatch3() {
+        Assertions.assertEquals("- 3 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch3(System.out::println))
+                .getMessage());
+    }
+
+    @Test
+    public void testTryCatch4() {
+        Assertions.assertEquals("- 2 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch4(System.out::println))
+                .getMessage());
+    }
+
+    @Test
+    public void testTryCatch5() {
+        Assertions.assertEquals("- 1 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch5(System.out::println))
+                .getMessage());
+    }
+
+    @Test
+    public void testTryCatch6() {
+        List<Integer> integers = new ArrayList<>();
+
+        Assertions.assertEquals(3,
+                new TryCatch().tryCatch6(integers::add));
+
+        Assertions.assertEquals(2, integers.size());
+
+        Assertions.assertEquals(1, integers.get(0));
+        Assertions.assertEquals(5, integers.get(1));
+    }
+
+    @Test
+    public void testTryCatch7() {
+        Assertions.assertEquals(1,
+                new TryCatch().tryCatch7(System.out::println));
+    }
+
+    @Test
+    public void testTryCatch8() {
+        Assertions.assertEquals("- 1 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch8(System.out::println))
+                .getMessage());
+    }
+
+    @Test
+    public void testTryCatch9() {
+        Assertions.assertEquals("- 2 -", Assertions.assertThrows(RuntimeException.class,
+                () -> new TryCatch().tryCatch9(System.out::println))
+                .getMessage());
+    }
+
+
+
+  =====================Try with resources================================
+
+       public void saveFile(String fileName, String text) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(fileName), Charset.defaultCharset()))) {
+            writer.write(text);
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+    }
+
+  =====================Try with resources END================================
