@@ -25,7 +25,7 @@ public class TemperatureConversion {
 
     public static void main(String[] args) throws IOException {
 
-        double temp;
+        double temp = 0;
         System.out.print("Введите температуру в Цельсиях: ");
         temp = getTemperature();
         System.out.println("Температура в Цельсиях: " + temp + ", в Фаренгейтах = " + conversionCToF(temp));
