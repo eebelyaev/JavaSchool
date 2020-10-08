@@ -1,6 +1,5 @@
 package lesson05.task01;
 
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -63,6 +62,7 @@ public class TerminalUIImpl implements TerminalUI {
         } else showMessage("Нет доступа");
     }
 
+    @FunctionalInterface
     interface ManipulateMoneyMethod {
         void func(int amount) throws TerminalException;
     }
