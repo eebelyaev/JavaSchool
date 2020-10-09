@@ -26,12 +26,12 @@ public class GammaCrypt {
      */
     private static String applyGammaEncription(String text, String gamma, boolean direction) {
         // сохраним текст как список номеров букв в алфавите
-        List<Integer> textList = Arrays.asList(text.split("")).stream()
+        List<Integer> textList = Arrays.asList(text.toUpperCase().split("")).stream()
                 .map(s -> s.codePointAt(0) - nullCharInAlf)
                 .collect(Collectors.toList());
         // сохраним код как список номеров букв в алфавите
         // инвертируется в зависимости от direction
-        List<Integer> gammaList = Arrays.asList(gamma.split("")).stream()
+        List<Integer> gammaList = Arrays.asList(gamma.toUpperCase().split("")).stream()
                 .map(s -> (direction ? 1 : -1) * (s.codePointAt(0) - nullCharInAlf))
                 .collect(Collectors.toList());
         // сохраним длину текста
